@@ -21,5 +21,7 @@ const (
 )
 
 const (
-	gSoundPath = "assets/sounds/beep.wav"
+	gWavExt = "wav"
+
+// 	gSoundPath = "assets/sounds/beep.wav"
 )

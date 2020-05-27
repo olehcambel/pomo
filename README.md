@@ -8,5 +8,5 @@
 - Follow [this](https://github.com/hajimehoshi/oto#prerequisite) link to install deps, required to play sound
 
 # Steps
-- go build .
-- ./pomo
+- go install
+- pomo

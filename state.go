@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/getlantern/systray"
+	raudio "github.com/olehcambel/pomo/assets/audio"
 	"github.com/olehcambel/pomo/sound"
 )
 
@@ -90,7 +91,7 @@ func (s *state) updateDeadline() {
 	limit := s.timer.timeLimit.Minutes()
 
 	if s.timer.isDeadline && int(diff)%int(limit) == 0 {
-		err := sound.PlayOnce(gSoundPath)
+		err := sound.PlayOnce(raudio.Beep_wav, gWavExt)
 
 		if err != nil {
 			log.Fatal(err)
@@ -99,7 +100,7 @@ func (s *state) updateDeadline() {
 		systray.SetTitle(tDeadline + " " + appTitle)
 		s.timer.isDeadline = true
 
-		err := sound.PlayOnce(gSoundPath)
+		err := sound.PlayOnce(raudio.Beep_wav, gWavExt)
 		if err != nil {
 			// sentry.CaptureException(err)
 			log.Fatal(err)
