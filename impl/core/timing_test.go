@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 
 func TestReset(t *testing.T) {
 	now := time.Now()
-	timer := timing{isDeadline: true, start: now}
+	timer := Timing{isDeadline: true, start: now}
 
 	assert.Equal(t, now, timer.start)
 	timer.reset()

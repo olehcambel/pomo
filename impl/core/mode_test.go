@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"testing"
@@ -8,8 +8,8 @@ import (
 
 func TestString(t *testing.T) {
 	samples := map[string]mode{
-		tModeRelax: mode(modeRelax),
-		tModeWork:  mode(modeWork),
+		tModeRelax: mode(ModeRelax),
+		tModeWork:  mode(ModeWork),
 		tWrongMode: mode(999),
 	}
 
@@ -20,8 +20,8 @@ func TestString(t *testing.T) {
 
 func TestGetSwap(t *testing.T) {
 	samples := map[mode]mode{
-		modeRelax: modeWork,
-		modeWork:  modeRelax,
+		ModeRelax: ModeWork,
+		ModeWork:  ModeRelax,
 		mode(999): mode(999),
 	}
 

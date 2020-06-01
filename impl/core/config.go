@@ -1,6 +1,9 @@
+package core
+
 // Configuration for the app. Loaded both from config file
 // and static configuration.
-package main
+
+// TODO: maybe MV to infra/conf.go ???
 
 const (
 	appTitle = "Pomo"

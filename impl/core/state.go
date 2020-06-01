@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"fmt"
@@ -17,88 +17,99 @@ type traymenu struct {
 
 // func (menu *traymenu) OK() {}
 
-type state struct {
-	mode
-	cron  *time.Ticker
+// State of the app
+type State struct {
+	Mode  mode
+	Cron  *time.Ticker
 	menu  traymenu
-	timer *timing
+	Timer *Timing
 	// sound
 }
 
-func (s *state) updateLoop() {
+func (s *State) updateLoop() {
 	s.updateTitle()
 	s.updateModeTitle()
 	s.updateStats()
+	// FIXME: ALSA lib pcm_dmix.c:1089:(snd_pcm_dmix_open) unable to open slave
 
-	for {
-		<-s.cron.C
+	for range s.Cron.C {
 		// @see https://golang.org/pkg/time/#hdr-Monotonic_Clocks
-		s.timer.start = s.timer.start.Round(0)
+		s.Timer.start = s.Timer.start.Round(0)
 
 		s.updateDeadline()
 		s.updateStats()
 	}
+	// for {
+	// 	<-s.Cron.C
+	// 	// @see https://golang.org/pkg/time/#hdr-Monotonic_Clocks
+	// 	s.Timer.start = s.Timer.start.Round(0)
+
+	// 	s.updateDeadline()
+	// 	s.updateStats()
+	// }
 }
 
 /* STATS */
-func (s *state) updateStats() {
+func (s *State) updateStats() {
 	// TODO: check for progress BELOW 0
-	s.menu.stats.SetTitle(fmt.Sprintf("%v: %v", tProgress, s.timer.diff()))
+	s.menu.stats.SetTitle(fmt.Sprintf("%v: %v", tProgress, s.Timer.diff()))
 }
 
-func (s *state) resetStats() {
-	if s.timer.isDeadline {
-		s.timer.isDeadline = false
+func (s *State) resetStats() {
+	if s.Timer.isDeadline {
+		s.Timer.isDeadline = false
 	}
-	s.timer.start = time.Now()
+	s.Timer.start = time.Now()
 	s.updateStats()
 }
 
 /* STATS END */
 
 // TODO: maybe MV to mode.go
-func (s *state) updateTitle() {
+func (s *State) updateTitle() {
 	var title string
 
-	if s.mode == modeWork {
+	if s.Mode == ModeWork {
 		title = appTitle
 	} else {
-		title = s.mode.String()
+		title = s.Mode.String()
 	}
 
+	Debug(title)
+	// FIXME: after long run, systray.SetTitle is not updating title
 	systray.SetTitle(title)
 }
 
-func (s *state) updateModeTitle() {
-	// previously ("Finish %v", s.mode)
-	s.menu.toggleMode.SetTitle(fmt.Sprint("Switch to ", s.mode.getSwap()))
+func (s *State) updateModeTitle() {
+	// previously ("Finish %v", s.Mode)
+	s.menu.toggleMode.SetTitle(fmt.Sprint("Switch to ", s.Mode.getSwap()))
 }
 
-func (s *state) toggleMode() {
-	s.mode = s.mode.getSwap()
+func (s *State) toggleMode() {
+	s.Mode = s.Mode.getSwap()
 
 	s.updateTitle()
 	s.updateModeTitle()
 	s.resetStats()
 }
 
-func (s *state) updateDeadline() {
-	if s.mode != modeWork {
+func (s *State) updateDeadline() {
+	if s.Mode != ModeWork {
 		return
 	}
 
-	diff := time.Since(s.timer.start).Minutes()
-	limit := s.timer.timeLimit.Minutes()
+	diff := time.Since(s.Timer.start).Minutes()
+	limit := s.Timer.timeLimit.Minutes()
 
-	if s.timer.isDeadline && int(diff)%int(limit) == 0 {
+	if s.Timer.isDeadline && int(diff)%int(limit) == 0 {
 		err := sound.PlayOnce(raudio.Beep_wav, gWavExt)
 
 		if err != nil {
 			log.Fatal(err)
 		}
-	} else if diff > limit && !s.timer.isDeadline {
+	} else if diff > limit && !s.Timer.isDeadline {
 		systray.SetTitle(tDeadline + " " + appTitle)
-		s.timer.isDeadline = true
+		s.Timer.isDeadline = true
 
 		err := sound.PlayOnce(raudio.Beep_wav, gWavExt)
 		if err != nil {
@@ -108,7 +119,8 @@ func (s *state) updateDeadline() {
 	}
 }
 
-func (s *state) onReady() {
+// OnReady runs when systray is ready
+func (s *State) OnReady() {
 	s.menu.stats = systray.AddMenuItem("---", "Stats")
 	s.menu.stats.Disable()
 
@@ -134,7 +146,8 @@ func (s *state) onReady() {
 	}()
 }
 
-func (s *state) onExit() {
-	s.cron.Stop()
+// OnExit runs when systray is going to exit
+func (s *State) OnExit() {
+	s.Cron.Stop()
 	log.Print("Exiting")
 }

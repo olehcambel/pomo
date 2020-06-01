@@ -1,17 +1,18 @@
-package main
+package core
 
 type mode int
 
+// Mode is type of the activity
 const (
-	modeWork mode = iota
-	modeRelax
+	ModeWork mode = iota
+	ModeRelax
 )
 
 func (m mode) String() string {
 	switch m {
-	case modeWork:
+	case ModeWork:
 		return tModeWork
-	case modeRelax:
+	case ModeRelax:
 		return tModeRelax
 	}
 
@@ -22,10 +23,10 @@ func (m mode) String() string {
 func (m mode) getSwap() mode {
 	// func (m *mode) swap() mode {
 	switch m {
-	case modeWork:
-		return modeRelax
-	case modeRelax:
-		return modeWork
+	case ModeWork:
+		return ModeRelax
+	case ModeRelax:
+		return ModeWork
 	}
 
 	return m
