@@ -75,7 +75,7 @@ func (s *State) updateTitle() {
 		title = s.Mode.String()
 	}
 
-	Debug(title)
+	// Debug(title)
 	// FIXME: after long run, systray.SetTitle is not updating title
 	systray.SetTitle(title)
 }

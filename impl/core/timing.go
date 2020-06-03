@@ -41,7 +41,7 @@ func fmtDuration(d time.Duration) string {
 		return fmt.Sprintf("%1.fm", m)
 	}
 
-	h := d.Minutes() / 60
-	m := d.Minutes() - float64(int(h)*60)
-	return fmt.Sprintf("%1.fh %1.fm", h, m)
+	h := d / time.Hour
+	m := (d / time.Minute) - (60 * h)
+	return fmt.Sprintf("%1.dh %1.dm", h, m)
 }
